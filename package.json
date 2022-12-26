@@ -1,0 +1,22 @@
+{
+  "name": "image-resizer-electron",
+  "version": "1.0.0",
+  "description": "Image resizer using electron.js",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "js",
+    "electron",
+    "image",
+    "resizer"
+  ],
+  "author": "Muhammad Hafiz Abdul Aziz",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^22.0.0",
+    "resize-img": "^2.0.0",
+    "toastify-js": "^1.12.0"
+  }
+}
