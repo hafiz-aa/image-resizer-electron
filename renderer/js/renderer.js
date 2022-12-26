@@ -29,6 +29,23 @@ function loadImage(e) {
 	outputPath.innerText = path.join(os.homedir(), 'imageresizer')
 }
 
+// Send image data to main
+function sendImage(e) {
+	e.preventDefault();
+
+	const width = widthInput.value
+	const height = heightInput.value
+
+	if (!img.files[0]) {
+		alertError('Please upload an image')
+		return
+	}
+
+	if (width === '' || height === '') {
+		alertError('Please fill in a height and width')
+	}
+}
+
 // Check if the file is image
 function isFileImage(file) {
 	const acceptedImageTypes = ['image/gif', 'image/png', 'image/jpeg']
@@ -61,3 +78,4 @@ function alertSuccess(message) {
 	})
 }
 img.addEventListener('change', loadImage)
+form.addEventListener('submit', sendImage)
