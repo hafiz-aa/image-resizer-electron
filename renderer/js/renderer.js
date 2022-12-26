@@ -29,23 +29,30 @@ function loadImage(e) {
 	outputPath.innerText = path.join(os.homedir(), 'imageresizer')
 }
 
+// Check if the file is image
+function isFileImage(file) {
+	const acceptedImageTypes = ['image/gif', 'image/png', 'image/jpeg']
+	return file && acceptedImageTypes.includes(file['type'])
+}
+
 // Send image data to main
 function sendImage(e) {
 	e.preventDefault();
-
-	const width = widthInput.value
-	const height = heightInput.value
-	const imgPath = img.files[0].path
 
 	if (!img.files[0]) {
 		alertError('Please upload an image')
 		return
 	}
 
-	if (width === '' || height === '') {
-		alertError('Please fill in a height and width')
+	if (widthInput.value === '' || heightInput.value === '') {
+		alertError('Please fill in a width and height')
 		return
 	}
+
+	const width = widthInput.value
+	const height = heightInput.value
+	const imgPath = img.files[0].path
+
 
 	//Send to main using ipcRenderer
 	ipcRenderer.send('image:resize', {
@@ -53,11 +60,12 @@ function sendImage(e) {
 	})
 }
 
-// Check if the file is image
-function isFileImage(file) {
-	const acceptedImageTypes = ['image/gif', 'image/png', 'image/jpeg']
-	return file && acceptedImageTypes.includes(file['type'])
-}
+// Catch the image:done event
+ipcRenderer.on('image:done', () =>
+	alertSuccess(`Image resized to ${heightInput.value} x ${widthInput.value}`)
+)
+
+
 
 function alertError(message) {
 	Toastify.toast({

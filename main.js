@@ -1,8 +1,13 @@
 const path = require('path')
-const { app, BrowserWindow, Menu } = require('electron')
+const os = require('os')
+const fs = require('fs')
+const resizeImg = require('resize-img')
+const { app, BrowserWindow, Menu, ipcMain, shell } = require('electron')
 
 const isDev = process.env.NODE_ENV !== 'production'
 const isMac = process.platform === 'darwin'
+
+let mainWindow
 
 // Main Window
 function createMainWindow() {
@@ -43,8 +48,12 @@ app.whenReady().then(() => {
 	// Implement Menu
 	const mainMenu = Menu.buildFromTemplate(menu)
 	Menu.setApplicationMenu(mainMenu)
-})
 
+	// Remove mainWindow when close
+	mainWindow.on('closed', () => (mainWindow = null))
+
+
+})
 
 // Menu template
 const menu = [
@@ -66,11 +75,56 @@ const menu = [
 			label: 'About',
 			click: createAboutWindow
 		}]
-	}] : []),
+	}]
+		: []),
 ]
 
+// Respond to ipcRenderer resize
+ipcMain.on('image:resize', (e, options) => {
+	options.dest = path.join(os.homedir(), 'imageresizer')
+	resizeImage(options)
+})
+
+// Resize the image
+async function resizeImage({ imgPath, width, height, dest }) {
+	try {
+		const newPath = await resizeImg(fs.readFileSync(imgPath), {
+			width: +width,
+			height: +height
+		})
+
+		// Create filename
+		const filename = path.basename(imgPath)
+
+		// Create dest folder if not exists
+		if (!fs.existsSync(dest)) {
+			fs.mkdirSync(dest)
+		}
+
+		// Write file to dest
+		fs.writeFileSync(path.join(dest, filename), newPath)
+
+		// Send success to render
+		mainWindow.webContents.send('image:done')
+
+		// Open dest folder
+		shell.openPath(dest)
+
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+// Quit when all windows are closed
 app.on('window-all-closed', () => {
 	if (!isMac) {
 		app.quit()
+	}
+})
+
+// Open a window if none are open(macOS)
+app.on('activate', () => {
+	if (BrowserWindow.getAllWindows().length === 0) {
+		createMainWindow()
 	}
 })
