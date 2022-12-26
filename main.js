@@ -4,16 +4,21 @@ const fs = require('fs')
 const resizeImg = require('resize-img')
 const { app, BrowserWindow, Menu, ipcMain, shell } = require('electron')
 
+process.env.NODE_ENV = 'production'
+
 const isDev = process.env.NODE_ENV !== 'production'
 const isMac = process.platform === 'darwin'
 
 let mainWindow
+let aboutWindow
 
 // Main Window
 function createMainWindow() {
-	const mainWindow = new BrowserWindow({
+	mainWindow = new BrowserWindow({
 		title: 'Image Resizer',
 		width: isDev ? 1000 : 500,
+		icon: `${__dirname}/assets/icons/Icon_256x256.png`,
+		resizable: isDev,
 		height: 600,
 		webPreferences: {
 			contextIsolation: true,
@@ -35,14 +40,16 @@ function createAboutWindow() {
 	const aboutWindow = new BrowserWindow({
 		title: 'About Image Resizer',
 		width: 300,
-		height: 300
+		height: 300,
+		title: 'About Electron',
+		icon: `${__dirname}/assets/icons/Icon_256x256.png`,
 	})
 
 	aboutWindow.loadFile(path.join(__dirname, './renderer/about.html'))
 }
 
 // When the app is ready, create the window
-app.whenReady().then(() => {
+app.on('ready', () => {
 	createMainWindow()
 
 	// Implement Menu
