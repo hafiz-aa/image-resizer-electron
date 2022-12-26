@@ -13,7 +13,8 @@ function loadImage(e) {
 		return
 	}
 
-	console.log('Success')
+	form.style.display = 'block'
+	filename.innerText = file.name
 }
 
 // Check if the file is image
