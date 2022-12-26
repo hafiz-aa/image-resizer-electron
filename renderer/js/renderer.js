@@ -35,6 +35,7 @@ function sendImage(e) {
 
 	const width = widthInput.value
 	const height = heightInput.value
+	const imgPath = img.files[0].path
 
 	if (!img.files[0]) {
 		alertError('Please upload an image')
@@ -43,7 +44,13 @@ function sendImage(e) {
 
 	if (width === '' || height === '') {
 		alertError('Please fill in a height and width')
+		return
 	}
+
+	//Send to main using ipcRenderer
+	ipcRenderer.send('image:resize', {
+		imgPath, width, height
+	})
 }
 
 // Check if the file is image
